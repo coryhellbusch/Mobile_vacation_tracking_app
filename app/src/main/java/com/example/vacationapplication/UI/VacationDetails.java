@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +18,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vacationapplication.R;
 import com.example.vacationapplication.database.Repository;
+import com.example.vacationapplication.entities.Excursion;
 import com.example.vacationapplication.entities.Vacation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VacationDetails extends AppCompatActivity {
 
@@ -32,6 +37,9 @@ public class VacationDetails extends AppCompatActivity {
     EditText editStart;
     EditText editEnd;
     Repository repository;
+    Vacation currentVacation;
+    int numVacations;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +78,11 @@ public class VacationDetails extends AppCompatActivity {
         final ExcursionAdapter excursionAdapter = new ExcursionAdapter(this);
         recyclerView.setAdapter(excursionAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        excursionAdapter.setExcursions(repository.getAllExcursions());
+        List<Excursion> filteredExcursions = new ArrayList<>();
+        for (Excursion e : repository.getAllExcursions()) {
+            if (e.getVacationId() == vacationID) filteredExcursions.add(e);
+        }
+        excursionAdapter.setExcursions(filteredExcursions);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,6 +104,23 @@ public class VacationDetails extends AppCompatActivity {
             vacation = new Vacation(vacationID, editLocation.getText().toString(),editHotel.getText().toString(),editStart.getText().toString(),editEnd.getText().toString());
             repository.update(vacation);
             this.finish();
+            }
+        }
+        if(item.getItemId()==R.id.vacationdelete){
+            for(Vacation vacay:repository.getmAllVacations()){
+                if(vacay.getVacationId()==vacationID)currentVacation=vacay;
+            }
+            numVacations = 0;
+            for(Excursion excursion: repository.getAllExcursions()){
+                if(excursion.getVacationId()==vacationID)++numVacations;
+            }
+            if(numVacations==0){
+                repository.delete(currentVacation);
+                Toast.makeText(VacationDetails.this,currentVacation.getVacationLocation() + " was deleted",Toast.LENGTH_LONG).show();
+                VacationDetails.this.finish();
+            }
+            else{
+                Toast.makeText(VacationDetails.this, "Can't delete a vacation with excursions",Toast.LENGTH_LONG).show();
             }
         }
         return true;
