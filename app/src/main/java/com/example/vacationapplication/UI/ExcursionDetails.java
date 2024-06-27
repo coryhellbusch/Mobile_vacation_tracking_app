@@ -148,9 +148,20 @@ public class ExcursionDetails extends AppCompatActivity {
             } else {
                 excursion = new Excursion(excursionId, editName.getText().toString(), editDate.getText().toString(), vacationId);
                 repository.update(excursion);
+                this.finish();
             }
             return true;
         }
+
+        if (item.getItemId() == R.id.excursiondelete) {
+            for (Excursion excur:repository.getAllExcursions()) {
+                if (excur.getExcursionId()==excursionId) currentExcursion = excur;
+            }
+            repository.delete(currentExcursion);
+            this.finish();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }
