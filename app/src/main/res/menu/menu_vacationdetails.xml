@@ -3,6 +3,12 @@
 
     <item android:title="Save Vacation"
         android:id="@+id/vacationsave"/>
+    <item android:title="Share"
+        android:id="@+id/share" />
+    <item android:title="Notify Starting Date"
+        android:id="@+id/notifystart" />
+    <item android:title="Notify Ending Date"
+        android:id="@+id/notifyend" />
     <item android:title="Delete Vacation"
         android:id="@+id/vacationdelete"/>
 
