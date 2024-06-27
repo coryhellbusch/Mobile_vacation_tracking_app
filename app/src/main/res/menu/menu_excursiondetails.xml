@@ -3,9 +3,6 @@
 
     <item android:title="Save Excursion"
         android:id="@+id/excursionsave" />
-    <item android:title="Share Excursion"
-        android:orderInCategory="100"
-        android:id="@+id/share"/>
     <item android:title="Notify"
         android:orderInCategory="100"
         android:id="@+id/notify"/>

@@ -1,6 +1,9 @@
 package com.example.vacationapplication.UI;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -39,9 +42,9 @@ public class ExcursionDetails extends AppCompatActivity {
     String name;
     int excursionId;
     int vacationId;
-
+    String vacationStartDate;
     String excursionDate;
-
+    String vacationEndDate;
     EditText editName;
     TextView editDate;
     Repository repository;
@@ -71,6 +74,9 @@ public class ExcursionDetails extends AppCompatActivity {
         excursionDate = getIntent().getStringExtra("excursionDate");
         editDate = findViewById(R.id.excursionDate);
         editDate.setText(excursionDate);
+        vacationStartDate = getIntent().getStringExtra("vacationStart");
+        vacationEndDate = getIntent().getStringExtra("vacationEnd");
+
 
         String myFormat = "MM/dd/yy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
@@ -132,25 +138,54 @@ public class ExcursionDetails extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.excursionsave) {
+            try {
+                Date vacationStart = sdf.parse(vacationStartDate);
+                Date vacationEnd = sdf.parse(vacationEndDate);
+                Date excurDate = sdf.parse(editDate.getText().toString());
 
-            if (vacationId == -1) {
-                Toast.makeText(this, "Vacation ID is not set", Toast.LENGTH_LONG).show();
-                return false;
-            }
+                if (excurDate.before(vacationStart) || excurDate.after(vacationEnd)) {
+                    Toast.makeText(ExcursionDetails.this,"Excursion date must be between the vacation start and end dates!", Toast.LENGTH_LONG).show();
+                    return false;
+                }
 
-            if (excursionId == -1) {
-                if (repository.getAllExcursions().isEmpty()) excursionId = 1;
-                else
-                    excursionId = repository.getAllExcursions().get(repository.getAllExcursions().size() -1).getExcursionId() + 1;
-                excursion = new Excursion(excursionId, editName.getText().toString(), editDate.getText().toString(), vacationId);
-                repository.insert(excursion);
-                this.finish();
-            } else {
-                excursion = new Excursion(excursionId, editName.getText().toString(), editDate.getText().toString(), vacationId);
-                repository.update(excursion);
-                this.finish();
+                if (vacationId == -1) {
+                    Toast.makeText(this, "Vacation ID is not set", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+
+                if (excursionId == -1) {
+                    if (repository.getAllExcursions().isEmpty()) excursionId = 1;
+                    else
+                        excursionId = repository.getAllExcursions().get(repository.getAllExcursions().size() - 1).getExcursionId() + 1;
+                    excursion = new Excursion(excursionId, editName.getText().toString(), editDate.getText().toString(), vacationId);
+                    repository.insert(excursion);
+                    this.finish();
+                } else {
+                    excursion = new Excursion(excursionId, editName.getText().toString(), editDate.getText().toString(), vacationId);
+                    repository.update(excursion);
+                    this.finish();
+                }
+                return true;
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(ExcursionDetails.this, "parse exception", Toast.LENGTH_LONG).show();
             }
-            return true;
+        }
+
+        if (item.getItemId() == R.id.notify) {
+            String dateFromScreen = editDate.getText().toString();
+            Date mydate = null;
+            try {
+                mydate = sdf.parse(dateFromScreen);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Long trigger = mydate.getTime();
+            Intent intent = new Intent(ExcursionDetails.this, MyReceiver.class);
+            intent.putExtra("key","Your excursion " + editName.getText().toString() + " is today!");
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            PendingIntent sender = PendingIntent.getBroadcast(ExcursionDetails.this, ++MainActivity.numAlert, intent, PendingIntent.FLAG_MUTABLE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, sender);
         }
 
         if (item.getItemId() == R.id.excursiondelete) {
