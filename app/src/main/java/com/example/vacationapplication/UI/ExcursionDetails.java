@@ -105,14 +105,14 @@ public class ExcursionDetails extends AppCompatActivity {
                 updateLabelStart();
             }
         };
-        Spinner spinner = findViewById(R.id.spinner);
-        ArrayList<Vacation> vacationArrayList = new ArrayList<>();
-
-        vacationArrayList.addAll(repository.getmAllVacations());
-
-        ArrayAdapter<Vacation>vacationAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,vacationArrayList);
-        spinner.setAdapter(vacationAdapter);
-        spinner.setSelection(0);
+//        Spinner spinner = findViewById(R.id.spinner);
+//        ArrayList<Vacation> vacationArrayList = new ArrayList<>();
+//
+//        vacationArrayList.addAll(repository.getmAllVacations());
+//
+//        ArrayAdapter<Vacation>vacationAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,vacationArrayList);
+//        spinner.setAdapter(vacationAdapter);
+//        spinner.setSelection(0);
     }
 
     private void updateLabelStart() {
